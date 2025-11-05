@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+   <html lang="en">
+   <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>Generate Questions</title>
+    
+    <style>
+      body {
+        font-family: "Roboto", sans-serif;
+        margin: 0;
+        padding: 20px;
+      }
+      .nav {
+        display: flex;
+        justify-content: flex-start;
+        margin-bottom: 20px;
+      }
+      .nav button {
+        font-size: 26px;
+        font-weight: 500;
+        margin-right: 20px;
+        padding-left: 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        background-color: white;
+        color: #737070;
+      }
+      .nav button.active {
+        color: #005900;
+        font-weight: 600;
+
+      }
+      .container {
+        display: none;
+      }
+      .generate-questions-container {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+      }
+      .generate-cards-container {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+        margin-bottom: 20px;
+      }
+      .left {
+        width: 45%;
+      }
+      .right {
+        width: 45%;
+        border: 1px solid #000;
+        padding: 10px;
+      }
+      .box {
+        margin-bottom: 20px;
+        border: 1px solid #000;
+        padding: 10px;
+      }
+      .container.active {
+        display: block;
+      }
+      .table-container {
+        width: 100%;
+        margin: 20px 0;
+        border-collapse: collapse;
+      }
+      th, td {
+        padding: 10px;
+        border: 1px solid #ddd;
+        text-align: center;
+      }
+      th, td {
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        hyphens: auto;
+      }
+      th {
+        background-color: #f4f4f4;
+        text-align: left;
+      }
+
+      .input-large {
+        width: 100%;
+        border: none;
+        resize: none;
+        overflow: hidden;
+        min-height: 50px;
+      }
+
+      .input-large:focus {
+        outline: none;
+      }
+
+      .select-category {
+        padding: 5px 15px;
+        border: 1px solid #9593A1; 
+        border-radius: 6px; 
+
+      }
+      .fetch-btn {
+        padding: 5px 20px;
+        border: 1px solid #9593A1; 
+        border-radius: 6px; 
+        cursor: pointer;
+      }
+
+      .generate-questions-btn {
+        background-color: #00D800; 
+        font-weight: 500; 
+        border: 1px solid #9593A1; 
+        border-radius: 6px; 
+        padding: 5px 15px;
+        cursor: pointer;
+
+      }
+
+    </style>
+  </head>
+   <body>
+      <div class="nav">
+        <button id="generateTab" class="active" onclick="showTab('generate')">Generate Questions</button>
+        <button id="manageTab" onclick="showTab('manage')">Manage Questions</button>
+        <button id="generateCardsTab" onclick="showTab('generateCards')">Generate Cards</button>
+        <button id="manageCardsTab" onclick="showTab('manageCards')">Manage Cards</button>
+      </div>
+
+      <div id="generate" class="container active">
+
+        <div>
+          <select class="select-category" id="categorySelect" onChange="loadPrompt()">
+            <option value="">Select Category</option>
+            <option value="History">History</option>
+            <option value="Math">Math</option>
+            <option value="Business">Business</option>
+            <option value="Literature">Literature</option>
+            <option value="Philosophy">Philosophy</option>
+            <option value="Geography">Geography</option>
+            <option value="SciFi">SciFi</option>
+            <option value="Science">Science</option>
+            <option value="SocialMedia">SocialMedia</option>
+            <option value="UX">UX</option>
+            <option value="Finance">Finance</option>
+            <option value="MentalHealth">MentalHealth</option>
+          </select>
+          <button onclick="fetchData()" class="fetch-btn">Fetch</button>
+        </div>
+  
+        <div class="generate-questions-container">
+          <div class="left">
+            <div class="box" id="questionsFetched">Questions fetched will show here</div>
+            <div class="box">
+              <textarea id="customPrompt" placeholder="Custom prompt here..." rows="20" cols="70" style="border: none; max-width: 100%;"></textarea>
+            </div>
+          </div>
+          <div class="right" id="finalPrompt">
+            This place shows the FULL TEXT OF PROMPT WE ARE SENDING TO OPENAI
+          </div>
+        </div>
+        
+        <button onclick="generateQuestions()" class="generate-questions-btn">Generate Questions</button>
+  
+        <br></br>
+        <div id="questionsGenerated" style="margin-left: 20px;"></div>
+
+
+      </div>
+
+      <div id="generateCards" class="container">
+        <div>
+          <select class="select-category" id="cardCategorySelect">
+            <option value="">Select Category</option>
+            <option value="History">History</option>
+            <option value="Math">Math</option>
+            <option value="Business">Business</option>
+            <option value="Literature">Literature</option>
+            <option value="Philosophy">Philosophy</option>
+            <option value="Geography">Geography</option>
+            <option value="SciFi">SciFi</option>
+            <option value="Science">Science</option>
+            <option value="SocialMedia">SocialMedia</option>
+            <option value="UX">UX</option>
+            <option value="Finance">Finance</option>
+            <option value="MentalHealth">MentalHealth</option>
+          </select>
+
+          <button onclick="fetchCardData()" class="fetch-btn">Fetch</button>
+
+          <div class="generate-cards-container">
+            <div class="left">
+              <div class="box" id="cardsFetched">Cards fetched will show here</div>
+            </div>
+            <div class="right">
+              <textarea 
+                id="finalCardPrompt" 
+                placeholder="Final prompt here..." 
+                rows="20" 
+                cols="70" 
+                style="max-width: 100%;"
+              >
+              </textarea>
+            </div>
+          </div>
+          
+
+          <button onclick="generateCard()" class="generate-questions-btn">Generate Card</button>
+        </div>
+      </div>
+
+      <div id="manage" class="container">
+        
+        <div>
+          <select class="select-category" id="manageCategorySelect" 
+          
+          >
+            <option value="">Select Category</option>
+            <option value="History">History</option>
+            <option value="Math">Math</option>
+            <option value="Business">Business</option>
+            <option value="Literature">Literature</option>
+            <option value="Philosophy">Philosophy</option>
+            <option value="Geography">Geography</option>
+            <option value="SciFi">SciFi</option>
+            <option value="Science">Science</option>
+            <option value="SocialMedia">SocialMedia</option>
+            <option value="UX">UX</option>
+            <option value="Finance">Finance</option>
+            <option value="MentalHealth">MentalHealth</option>
+          </select>
+          <button onclick="fetchManageQuestions()" class="fetch-btn">Fetch</button>
+        </div>
+        <h2 id="selectedCategoryHeader"></h2>
+        <table class="table-container" id="questionsTable">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>English</th>
+              <th>Hinglish</th>
+              <th>Gujlish</th>
+              <th>Answers</th>
+              <th>Labels</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="questionsBody">
+            <!-- Rows will be dynamically added here -->
+          </tbody>
+        </table>
+        <div id="paginationControls"></div>
+
+        
+        
+
+      </div>
+
+      <div id="manageCards" class="container">
+        <div>
+          <select class="select-category" id="manageCardCategorySelect">
+            <option value="">Select Category</option>
+            <option value="History">History</option>
+            <option value="Math">Math</option>
+            <option value="Business">Business</option>
+            <option value="Literature">Literature</option>
+            <option value="Philosophy">Philosophy</option>
+            <option value="Geography">Geography</option>
+            <option value="SciFi">SciFi</option>
+            <option value="Science">Science</option>
+            <option value="SocialMedia">SocialMedia</option>
+            <option value="UX">UX</option>
+            <option value="Finance">Finance</option>
+            <option value="MentalHealth">MentalHealth</option>
+          </select>
+          <button onclick="fetchManageCards()" class="fetch-btn">Fetch</button>
+        </div>
+        <table class="table-container" id="cardsTable">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Title</th>
+              <th>Content</th>
+              <th>Audio Labels</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="cardsBody">
+            <!-- Card rows will be added here -->
+          </tbody>
+        </table>
+      </div>
+
+     <script>
+
+      function showTab(tab) {
+        document.querySelectorAll('.nav button').forEach(button => {
+          button.classList.toggle('active', button.id === tab + 'Tab');
+        });
+        document.querySelectorAll('.container').forEach(section => {
+          section.classList.toggle('active', section.id === tab);
+        });
+      }
+
+      let prompts = {};
+
+      async function fetchPrompts() {
+        try {
+          const response = await fetch('/api/prompts');
+          prompts = await response.json();
+          console.log('Prompts loaded:', prompts); 
+        } catch (error) {
+          console.error('Error fetching prompts:', error);
+        }
+      }
+
+      function loadPrompt() {
+        const category = document.getElementById('categorySelect').value;
+        const customPrompt = document.getElementById("customPrompt");
+        customPrompt.value = prompts[category] || '';
+      }
+
+      async function fetchData() {
+        const category = document.getElementById('categorySelect').value;
+        const customPrompt = document.getElementById("customPrompt").value;
+
+        if (category) {
+          try {
+            const response = await fetch(`/api/questions?categories=${category}`);
+
+            const questions = await response.json();
+            
+            const promptResponse = await fetch('/api/get-final-prompt', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ category, categoryPrompt: customPrompt })
+            });
+            const data = await promptResponse.json();
+            
+            document.getElementById('finalPrompt').textContent = `${data.prompt}`;
+            document.getElementById('questionsFetched').textContent = `${data.existingQsString}`;
+
+
+          } catch (error) {
+            console.error('Error fetching questions:', error);
+          }
+
+          loadPrompt();
+        }
+      }
+
+      async function fetchCardData() {
+        const category = document.getElementById('cardCategorySelect').value;
+
+        if (category) {
+          try {
+            const response = await fetch(`/api/cards?categories=${category}`);
+
+            const cards = await response.json();
+            
+            const promptResponse = await fetch('/api/get-final-card-prompt', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ category })
+            });
+            const data = await promptResponse.json();
+            
+            document.getElementById('finalCardPrompt').textContent = `${data.prompt}`;
+            document.getElementById('cardsFetched').textContent = `${data.existingCardsString}`;
+            console.log(`${data.prompt}`)
+
+
+          } catch (error) {
+            console.error('Error fetching cards:', error);
+          }
+
+          loadPrompt();
+        }
+      }
+
+
+
+      async function generateQuestions() {
+        const category = document.getElementById('categorySelect').value;
+        const finalPromptDiv = document.getElementById('finalPrompt');
+        const questionsGenerated = document.getElementById('questionsGenerated');
+
+        if (category) {
+          questionsGenerated.textContent = `Generating ${category} questions...`; 
+          
+
+          try {
+            const response = await fetch('/api/generate-questions', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ category, categoryPrompt: customPrompt })
+            });
+            const result = await response.json();
+            console.log(result.message);
+
+            questionsGenerated.textContent = `50 ${result.message}.`;
+
+          } catch (error) {
+            console.error('Error generating questions:', error);
+          }
+        }
+         
+      }
+
+      async function fetchManageQuestions() {
+        const category = document.getElementById('manageCategorySelect').value;
+        if (category) {
+          try {
+            const response = await fetch(`/api/questions?categories=${category}`);
+            const questions = await response.json();
+            displayQuestions(questions, category);
+          } catch (error) {
+            console.error('Error fetching questions:', error);
+          }
+        }
+      }
+
+      
+
+      function displayQuestions(questions, category) {
+        const tableBody = document.getElementById('questionsBody');
+        const categoryHeader = document.getElementById('selectedCategoryHeader');
+
+        tableBody.innerHTML = ''; 
+        categoryHeader.textContent = category; 
+
+
+        questions.forEach((q, index) => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+
+            <td style="width: 60px;">${index + 1}. ${q._id.slice(0, 5)}...</td>
+            <td><textarea class="en-text" disabled>${q.question.en}</textarea></td>
+            <td><textarea class="hinglish-text" disabled>${q.question.hinglish}</textarea></td>
+            <td><textarea class="gujlish-text"" disabled>${q.question.gujlish}</textarea></td>
+
+            <td>
+              ${q.options.map((opt, i) => `
+                <div>
+                  <input type="checkbox" name="correct" value="${i}" ${q.correct === i ? 'checked' : ''} />
+                  <input type="text" value="${opt}" disabled />
+                </div>
+              `).join('')}
+            </td>
+            
+            <td><textarea class="question-labels-text" disabled>${q.labels.join(", ")}</textarea></td>
+            
+            <td>
+              <button onclick="editQuestion('${q._id}', this)">✏️</button>
+              <button onclick="saveQuestion('${q._id}', this)">✔️</button>
+              <button onclick="deleteQuestion('${q._id}')">🗑️</button>
+            </td>
+          `;
+          tableBody.appendChild(row);
+        });
+      }
+
+      function editQuestion(id, button) {
+        const row = button.closest('tr');
+        
+        Array.from(row.querySelectorAll('textarea, input[type=text]')).forEach(input => {
+          input.disabled = false;
+        });
+      }
+
+      
+
+     
+
+      async function saveQuestion(id, button) {
+        try {
+          const row = button.closest('tr');
+          const enTextArea = row.querySelector('.en-text');
+          const hinglishTextArea = row.querySelector('.hinglish-text');
+          const gujlishTextArea = row.querySelector('.gujlish-text');
+          const checkboxes = row.querySelectorAll('input[type=checkbox]');
+          const optionInputs = row.querySelectorAll('input[type=text]:not([name="correct"])');
+          const labelsTextArea = row.querySelector('.question-labels-text');
+
+          let correctIndex = -1;
+          checkboxes.forEach((checkbox) => {
+            if (checkbox.checked) correctIndex = parseInt(checkbox.value, 10);
+          });
+
+          const updatedQuestion = {
+            question: {
+              en: enTextArea.value.trim(),
+              hinglish: hinglishTextArea.value.trim(),
+              gujlish: gujlishTextArea.value.trim(),
+              
+            },
+            options: Array.from(optionInputs).map(input => input.value.trim()),
+            correct: correctIndex,
+            labels: labelsTextArea.value.split(',').map(label => label.trim())
+          };
+
+          const imgElement = row.querySelector('img');
+          updatedQuestion.logo = imgElement ? imgElement.src : '';
+
+          console.log('Updating question with data:', updatedQuestion);
+
+          const response = await fetch(`/api/questions/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedQuestion),
+          });
+
+          if (response.ok) {
+            alert('Question updated successfully!');
+            row.querySelectorAll('textarea, input[type=text]').forEach(input => input.disabled = true);
+          } else {
+            const errorData = await response.json();
+            alert(`Failed to update question: ${errorData.error}`);
+          }
+        } catch (error) {
+          console.error('Error updating question:', error);
+        }
+      }
+
+
+      async function deleteQuestion(id) {
+        if (confirm('Are you sure you want to delete this question?')) {
+          try {
+            const response = await fetch(`/api/questions/${id}`, { method: 'DELETE' });
+            if (response.ok) {
+              alert('Question deleted successfully!');
+              fetchManageQuestions(); 
+            } else {
+              alert('Failed to delete question.');
+            }
+          } catch (error) {
+            console.error('Error deleting question:', error);
+          }
+        }
+      }
+
+
+
+
+
+      async function generateCard() {
+        const category = document.getElementById('cardCategorySelect').value;
+        const prompt = document.getElementById('finalCardPrompt').value.trim(); // Get the edited prompt
+        
+        if (category && prompt) {
+          try {
+            const response = await fetch('/api/generate-card', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ category, prompt })
+            });
+
+            if (response.ok) {
+              const data = await response.json();
+              const card = data.card;
+
+            
+
+              alert('Card generated successfully!');
+            } else {
+              alert('Failed to generate card.');
+            }
+          } catch (error) {
+            console.error('Error generating card:', error);
+          }
+        } else {
+          alert('Please fill in all fields.');
+        }
+      }
+
+
+
+
+      async function fetchManageCards() {
+        const category = document.getElementById('manageCardCategorySelect').value;
+        if (category) {
+          try {
+            const response = await fetch(`/api/cards?category=${category}`);
+            const cards = await response.json();
+            displayCards(cards, category);
+          } catch (error) {
+            console.error('Error fetching cards:', error);
+          }
+        }
+      }
+
+      function displayCards(cards, category) {
+        const tableBody = document.getElementById('cardsBody');
+        tableBody.innerHTML = '';
+
+        cards.forEach((card, index) => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${index + 1}. ${card._id.slice(0, 5)}...</td>
+            <td><textarea class="card-title-text" disabled>${card.title}</textarea></td>
+            <td><textarea class="card-content-text" disabled>${card.content}</textarea></td>
+            <td>
+              <select class="card-audio-dropdown" disabled>
+                <option value="audio1" ${card.audioLabels === "audio1" ? 'selected' : ''}>Audio 1</option>
+                <option value="audio2" ${card.audioLabels === "audio2" ? 'selected' : ''}>Audio 2</option>
+                <option value="audio3" ${card.audioLabels === "audio3" ? 'selected' : ''}>Audio 3</option>
+                <option value="audio4" ${card.audioLabels === "audio4" ? 'selected' : ''}>Audio 4</option>
+              </select>
+            </td>
+            <td>
+              <button onclick="editCard('${card._id}', this)">✏️</button>
+              <button onclick="saveCard('${card._id}', this)">✔️</button>
+              <button onclick="deleteCard('${card._id}')">🗑️</button>
+            </td>
+          `;
+          tableBody.appendChild(row);
+        });
+      }
+
+      function editCard(id, button) {
+        const row = button.closest('tr');
+        Array.from(row.querySelectorAll('textarea, .card-audio-dropdown')).forEach(input => (input.disabled = false));
+      }
+
+      async function saveCard(id, button) {
+        const row = button.closest('tr');
+        const title = row.querySelector('.card-title-text');
+        const content = row.querySelector('.card-content-text');
+        const audioDropdown = row.querySelector('.card-audio-dropdown');
+
+        const updatedCard = { 
+          title: title.value.trim(), 
+          content: content.value.trim(),
+          audioLabels: audioDropdown.value
+        };
+        console.log('Updated Information card', updatedCard)
+
+        try {
+          const response = await fetch(`/api/cards/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedCard),
+          });
+
+          if (response.ok) {
+            alert('Card updated successfully!');
+            Array.from(row.querySelectorAll('textarea')).forEach(input => (input.disabled = true));
+          } else {
+            alert('Failed to update card.');
+          }
+        } catch (error) {
+          console.error('Error updating card:', error);
+        }
+      }
+
+      async function deleteCard(id) {
+        if (confirm('Are you sure you want to delete this card?')) {
+          try {
+            const response = await fetch(`/api/cards/${id}`, { method: 'DELETE' });
+            if (response.ok) {
+              alert('Card deleted successfully!');
+              fetchManageCards();
+            } else {
+              alert('Failed to delete card.');
+            }
+          } catch (error) {
+            console.error('Error deleting card:', error);
+          }
+        }
+      }
+
+
+      window.onload = fetchPrompts;
+
+     </script>
+   </body>
+   </html>
+
+
