@@ -35,9 +35,7 @@ Personalized quiz generation using LLMs
 Real-time score calculation  
 Progress tracking  
 Gamified UI (badges, rewards, or streaks)  
-Responsive and minimal design  
 Secure authentication + data persistence  
-Leaderboard / competitive scoring (if applicable)  
 
 ---
 
