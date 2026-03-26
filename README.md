@@ -47,7 +47,5 @@ Secure authentication + data persistence
 - Managing real-time user progress in the frontend + backend  
 - Thinking about scalability and session management  
 
-<img width="2880" height="1366" alt="image" src="https://github.com/user-attachments/assets/6904545f-bf40-4de1-a346-ede982a0ec4d" />
-<img width="2880" height="1368" alt="image" src="https://github.com/user-attachments/assets/83ac0685-457d-40b7-9ee8-b181bb157c64" />
-<img width="2880" height="1370" alt="image" src="https://github.com/user-attachments/assets/0d4d5221-84dc-4923-8d87-28a147497f53" />
+
 
